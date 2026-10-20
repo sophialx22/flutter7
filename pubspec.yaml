@@ -1,0 +1,42 @@
+name: fluffer1
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_bloc: ^9.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf
+        - asset: assets/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf
+          style: italic
+    - family: Ubuntu
+      fonts:
+        - asset: assets/fonts/Ubuntu/Ubuntu-Regular.ttf
+        - asset: assets/fonts/Ubuntu/Ubuntu-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Ubuntu/Ubuntu-Italic.ttf
+          style: italic
+        - asset: assets/fonts/Ubuntu/Ubuntu-BoldItalic.ttf
+          weight: 700
+          style: italic
