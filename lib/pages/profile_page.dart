@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/text_field.dart';
+import '../routes.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -18,8 +19,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController();
-    _emailController = TextEditingController();
+    _nameController = TextEditingController(text: 'Лукиных София Даниловна');
+    _emailController = TextEditingController(text: 'sofi@gmail.com');
   }
 
   @override
@@ -27,8 +28,8 @@ class _ProfilePageState extends State<ProfilePage> {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is Map) {
-      _nameController.text = args['name'] ?? '';
-      _emailController.text = args['email'] ?? '';
+      _nameController.text = args['name'] ?? _nameController.text;
+      _emailController.text = args['email'] ?? _emailController.text;
     }
   }
 
@@ -44,11 +45,9 @@ class _ProfilePageState extends State<ProfilePage> {
   void _submit() {
     if (_formKey.currentState?.validate() ?? false) {
       FocusScope.of(context).unfocus();
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Профиль сохранён')));
-      Navigator.pop(context, {
-        'name': _nameController.text,
-        'email': _emailController.text,
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Профиль сохранён')),
+      );
     }
   }
 
@@ -56,7 +55,10 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios), onPressed: () => Navigator.pop(context)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text('Профиль'),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -69,27 +71,79 @@ class _ProfilePageState extends State<ProfilePage> {
           key: _formKey,
           child: ListView(
             children: [
-              const Center(child: CircleAvatar(radius: 60, backgroundImage: NetworkImage('https://img.icons8.com/color/256/dog.png'))),
+              const Center(
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundImage: NetworkImage(
+                    'https://img.icons8.com/color/256/dog.png',
+                  ),
+                ),
+              ),
               const SizedBox(height: 30),
-              CustomTextFormField(inputType: InputFieldType.name, labelText: 'ФИО', hintText: 'Иванов Иван Иванович', prefixIcon: const Icon(Icons.person), controller: _nameController),
+              CustomTextFormField(
+                inputType: InputFieldType.name,
+                labelText: 'ФИО',
+                hintText: 'Лукиных София Даниловна',
+                prefixIcon: const Icon(Icons.person),
+                controller: _nameController,
+              ),
               const SizedBox(height: 16),
-              CustomTextFormField(inputType: InputFieldType.email, labelText: 'Email', hintText: 'example@mail.com', prefixIcon: const Icon(Icons.email), controller: _emailController),
+              CustomTextFormField(
+                inputType: InputFieldType.email,
+                labelText: 'Email',
+                hintText: 'sofi@gmail.com',
+                prefixIcon: const Icon(Icons.email),
+                controller: _emailController,
+              ),
               const SizedBox(height: 16),
-              CustomTextFormField(inputType: InputFieldType.password, labelText: 'Пароль', hintText: 'Введите пароль', prefixIcon: const Icon(Icons.shield), controller: _passwordController),
+              CustomTextFormField(
+                inputType: InputFieldType.password,
+                labelText: 'Пароль',
+                hintText: 'Введите пароль',
+                prefixIcon: const Icon(Icons.shield),
+                controller: _passwordController,
+              ),
               const SizedBox(height: 16),
-              CustomTextFormField(inputType: InputFieldType.password, labelText: 'Повторите пароль', hintText: 'Повторите пароль', prefixIcon: const Icon(Icons.shield), controller: _confirmController, textInputAction: TextInputAction.done, onFieldSubmitted: _submit),
+              CustomTextFormField(
+                inputType: InputFieldType.password,
+                labelText: 'Повторите пароль',
+                hintText: 'Повторите пароль',
+                prefixIcon: const Icon(Icons.shield),
+                controller: _confirmController,
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: _submit,
+              ),
               const SizedBox(height: 30),
               SizedBox(
                 height: 50,
                 child: ElevatedButton(
                   onPressed: _submit,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
                   child: const Text('Сохранить'),
                 ),
               ),
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: 1,
+        onDestinationSelected: (index) {
+          if (index == 0) {
+            Navigator.pushReplacementNamed(context, Routes.home);
+          } else if (index == 1) {
+          }
+        },
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home), label: 'Главная'),
+          NavigationDestination(icon: Icon(Icons.person), label: 'Профиль'),
+        ],
       ),
     );
   }

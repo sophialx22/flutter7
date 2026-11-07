@@ -1,72 +1,111 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../models/home_item.dart';
 import '../../routes.dart';
+import 'bloc/home_bloc.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => HomeBloc()..add(const LoadHomeData()),
+      child: const _HomeView(),
+    );
+  }
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomeView extends StatefulWidget {
+  const _HomeView();
+
+  @override
+  State<_HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<_HomeView> {
   int _selectedIndex = 0;
-
-  String _userName = 'Иванов Иван Иванович';
-  String _userEmail = 'test123@mail.ru';
-
-  final List<String> images = const [
-    'assets/images/11.jpg',
-    'assets/images/10.jpg',
-    'assets/images/3.jpg',
-    'assets/images/9.jpg',
-    'assets/images/14.png',
-  ];
-
-  final List<Map<String, dynamic>> items = const [
-    {'title': 'Просмотр фильмов', 'subtitle': 'Смотрите фильмы и сериалы онлайн', 'icon': Icons.play_circle},
-    {'title': 'Подписка', 'subtitle': 'Оформите подписку на сервис', 'icon': Icons.card_membership},
-    {'title': 'Онлайн-трансляция', 'subtitle': 'Прямые трансляции и премьеры', 'icon': Icons.live_tv},
-    {'title': 'Личный кабинет', 'subtitle': 'Управляйте своим профилем', 'icon': Icons.person},
-  ];
+  String _userName = 'Лукиных София Даниловна';
+  String _userEmail = 'sofi@gmail.com';
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is Map) {
-      _userName = args['name'] ?? _userName;
-      _userEmail = args['email'] ?? _userEmail;
-    }
-  }
-
-  Future<void> _openProfile() async {
-    final result = await Navigator.pushNamed(
-      context,
-      Routes.profile,
-      arguments: {'name': _userName, 'email': _userEmail},
-    );
-    if (result != null && result is Map) {
       setState(() {
-        _userName = result['name'] ?? _userName;
-        _userEmail = result['email'] ?? _userEmail;
+        _userName = args['name'] ?? _userName;
+        _userEmail = args['email'] ?? _userEmail;
       });
     }
   }
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
-    if (index == 1) _openProfile();
-  }
-
-  void _onItemCardTap(String title) {
-    if (title == 'Личный кабинет') {
-      _openProfile();
-    } else {
-      Navigator.pushNamed(context, Routes.detail);
+    if (index == 1) {
+      Navigator.pushNamed(
+        context,
+        Routes.profile,
+        arguments: {'name': _userName, 'email': _userEmail},
+      ).then((_) {
+        if (mounted) setState(() => _selectedIndex = 0);
+      });
     }
   }
 
-  Widget _buildHomeContent() {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Онлайн-кинотеатры', style: TextStyle(fontFamily: 'Ubuntu', fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        backgroundColor: Colors.pink,
+      ),
+      body: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          switch (state) {
+            case HomeInitial():
+              return const Center(child: Text('Данные не загружены'));
+            case HomeLoading():
+              return const Center(child: CircularProgressIndicator());
+            case HomeError(:final message):
+              return Center(child: Text(message));
+            case HomeLoaded(:final items, :final images):
+              return _HomeContent(
+                items: items,
+                images: images,
+                onItemTap: (title) {
+                  if (title == 'Личный кабинет') {
+                    _onItemTapped(1);
+                  } else {
+                    Navigator.pushNamed(context, Routes.detail);
+                  }
+                },
+              );
+          }
+        },
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: _onItemTapped,
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home), label: 'Главная'),
+          NavigationDestination(icon: Icon(Icons.person), label: 'Профиль'),
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeContent extends StatelessWidget {
+  final List<HomeItem> items;
+  final List<String> images;
+  final Function(String) onItemTap;
+
+  const _HomeContent({required this.items, required this.images, required this.onItemTap});
+
+  @override
+  Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool isWide = constraints.maxWidth > 600;
@@ -78,7 +117,18 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [_buildTitle(), const SizedBox(height: 20), _buildDescription(), const SizedBox(height: 20), _buildImagesGrid()])),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildTitle(),
+                      const SizedBox(height: 20),
+                      _buildDescription(),
+                      const SizedBox(height: 20),
+                      _buildImagesGrid(),
+                    ],
+                  ),
+                ),
                 SizedBox(width: spacing),
                 Expanded(child: _buildItemsGrid()),
               ],
@@ -100,7 +150,13 @@ class _HomePageState extends State<HomePage> {
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: images.length,
-                  itemBuilder: (context, index) => Container(margin: const EdgeInsets.only(right: 10), child: ClipRRect(borderRadius: BorderRadius.circular(15), child: Image.asset(images[index], width: 150, height: 150, fit: BoxFit.cover))),
+                  itemBuilder: (context, index) => Container(
+                    margin: const EdgeInsets.only(right: 10),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image.asset(images[index], width: 150, height: 150, fit: BoxFit.cover),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -127,11 +183,11 @@ class _HomePageState extends State<HomePage> {
       return Card(
         margin: const EdgeInsets.only(bottom: 10),
         child: ListTile(
-          leading: Icon(item['icon'], color: Colors.pink),
-          title: Text(item['title']),
-          subtitle: Text(item['subtitle']),
+          leading: Icon(item.icon, color: Colors.pink),
+          title: Text(item.title),
+          subtitle: Text(item.subtitle),
           trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => _onItemCardTap(item['title']),
+          onTap: () => onItemTap(item.title),
         ),
       );
     },
@@ -146,26 +202,13 @@ class _HomePageState extends State<HomePage> {
       final item = items[index];
       return Card(
         child: ListTile(
-          leading: Icon(item['icon'], color: Colors.pink),
-          title: Text(item['title'], style: const TextStyle(fontSize: 14)),
-          onTap: () => _onItemCardTap(item['title']),
+          leading: Icon(item.icon, color: Colors.pink),
+          title: Text(item.title, style: const TextStyle(fontSize: 14)),
+          onTap: () => onItemTap(item.title),
         ),
       );
     },
   );
 
   Widget _buildAuthor() => const Row(children: [Icon(Icons.person, size: 40, color: Colors.pink), SizedBox(width: 12), Text('Лукиных С.Д., группа ИКБО-61-23', style: TextStyle(fontFamily: 'Ubuntu', fontSize: 16))]);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Онлайн-кинотеатры', style: TextStyle(fontFamily: 'Ubuntu', fontWeight: FontWeight.bold)), centerTitle: true, backgroundColor: Colors.pink),
-      body: _buildHomeContent(),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: _onItemTapped,
-        destinations: const [NavigationDestination(icon: Icon(Icons.home), label: 'Главная'), NavigationDestination(icon: Icon(Icons.person), label: 'Профиль')],
-      ),
-    );
-  }
 }
