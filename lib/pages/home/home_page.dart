@@ -26,7 +26,7 @@ class _HomeView extends StatefulWidget {
 class _HomeViewState extends State<_HomeView> {
   int _selectedIndex = 0;
   String _userName = 'Лукиных София Даниловна';
-  String _userEmail = 'sofi@gmail.com';
+  String _userEmail = 'sofilukin2@gmail.com';
 
   @override
   void didChangeDependencies() {
@@ -43,13 +43,11 @@ class _HomeViewState extends State<_HomeView> {
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
     if (index == 1) {
-      Navigator.pushNamed(
+      Navigator.pushReplacementNamed(
         context,
         Routes.profile,
         arguments: {'name': _userName, 'email': _userEmail},
-      ).then((_) {
-        if (mounted) setState(() => _selectedIndex = 0);
-      });
+      );
     }
   }
 
@@ -57,7 +55,10 @@ class _HomeViewState extends State<_HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Онлайн-кинотеатры', style: TextStyle(fontFamily: 'Ubuntu', fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Онлайн-кинотеатры',
+          style: TextStyle(fontFamily: 'Ubuntu', fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         backgroundColor: Colors.pink,
       ),
@@ -78,7 +79,7 @@ class _HomeViewState extends State<_HomeView> {
                   if (title == 'Личный кабинет') {
                     _onItemTapped(1);
                   } else {
-                    Navigator.pushNamed(context, Routes.detail);
+                    Navigator.pushReplacementNamed(context, Routes.detail);
                   }
                 },
               );
@@ -170,9 +171,38 @@ class _HomeContent extends StatelessWidget {
     );
   }
 
-  Widget _buildTitle() => Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(border: Border.all(color: Colors.pink), borderRadius: BorderRadius.circular(20)), child: const Text('Название ПО: Онлайн-кинотеатр', style: TextStyle(fontFamily: 'Ubuntu', fontSize: 20, fontWeight: FontWeight.bold)));
-  Widget _buildDescription() => Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(border: Border.all(color: Colors.pink), borderRadius: BorderRadius.circular(20)), child: const Text('Описание: Онлайн-кинотеатр — это сервис, который позволяет смотреть фильмы и сериалы через интернет без скачивания.', style: TextStyle(fontFamily: 'Ubuntu', fontSize: 16)));
-  Widget _buildImagesGrid() => SizedBox(height: 200, child: ListView.builder(scrollDirection: Axis.horizontal, itemCount: images.length, itemBuilder: (context, index) => Container(margin: const EdgeInsets.only(right: 10), child: ClipRRect(borderRadius: BorderRadius.circular(15), child: Image.asset(images[index], width: 150, height: 150, fit: BoxFit.cover)))));
+  Widget _buildTitle() => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(border: Border.all(color: Colors.pink), borderRadius: BorderRadius.circular(20)),
+    child: const Text('Название ПО: Онлайн-кинотеатр',
+        style: TextStyle(fontFamily: 'Ubuntu', fontSize: 20, fontWeight: FontWeight.bold)),
+  );
+
+  Widget _buildDescription() => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(border: Border.all(color: Colors.pink), borderRadius: BorderRadius.circular(20)),
+    child: const Text(
+      'Описание: Онлайн-кинотеатр — это сервис, который позволяет смотреть фильмы и сериалы через интернет без скачивания.',
+      style: TextStyle(fontFamily: 'Ubuntu', fontSize: 16),
+    ),
+  );
+
+  Widget _buildImagesGrid() => SizedBox(
+    height: 200,
+    child: ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: images.length,
+      itemBuilder: (context, index) => Container(
+        margin: const EdgeInsets.only(right: 10),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: Image.asset(images[index], width: 150, height: 150, fit: BoxFit.cover),
+        ),
+      ),
+    ),
+  );
 
   Widget _buildItemsList() => ListView.builder(
     shrinkWrap: true,
@@ -196,7 +226,8 @@ class _HomeContent extends StatelessWidget {
   Widget _buildItemsGrid() => GridView.builder(
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 2.5),
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 2.5),
     itemCount: items.length,
     itemBuilder: (context, index) {
       final item = items[index];
@@ -210,5 +241,11 @@ class _HomeContent extends StatelessWidget {
     },
   );
 
-  Widget _buildAuthor() => const Row(children: [Icon(Icons.person, size: 40, color: Colors.pink), SizedBox(width: 12), Text('Лукиных С.Д., группа ИКБО-61-23', style: TextStyle(fontFamily: 'Ubuntu', fontSize: 16))]);
+  Widget _buildAuthor() => const Row(
+    children: [
+      Icon(Icons.person, size: 40, color: Colors.pink),
+      SizedBox(width: 12),
+      Text('Лукиных С.Д., группа ИКБО-61-23', style: TextStyle(fontFamily: 'Ubuntu', fontSize: 16)),
+    ],
+  );
 }

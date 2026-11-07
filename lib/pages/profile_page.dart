@@ -20,7 +20,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: 'Лукиных София Даниловна');
-    _emailController = TextEditingController(text: 'sofi@gmail.com');
+    _emailController = TextEditingController(text: 'sofilukin2@gmail.com');
   }
 
   @override
@@ -55,10 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
         title: const Text('Профиль'),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -74,9 +71,7 @@ class _ProfilePageState extends State<ProfilePage> {
               const Center(
                 child: CircleAvatar(
                   radius: 60,
-                  backgroundImage: NetworkImage(
-                    'https://img.icons8.com/color/256/dog.png',
-                  ),
+                  backgroundImage: NetworkImage('https://img.icons8.com/color/256/dog.png'),
                 ),
               ),
               const SizedBox(height: 30),
@@ -91,7 +86,7 @@ class _ProfilePageState extends State<ProfilePage> {
               CustomTextFormField(
                 inputType: InputFieldType.email,
                 labelText: 'Email',
-                hintText: 'sofi@gmail.com',
+                hintText: 'sofilukin2@gmail.com',
                 prefixIcon: const Icon(Icons.email),
                 controller: _emailController,
               ),
@@ -121,9 +116,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
                   child: const Text('Сохранить'),
                 ),
@@ -137,7 +130,6 @@ class _ProfilePageState extends State<ProfilePage> {
         onDestinationSelected: (index) {
           if (index == 0) {
             Navigator.pushReplacementNamed(context, Routes.home);
-          } else if (index == 1) {
           }
         },
         destinations: const [
