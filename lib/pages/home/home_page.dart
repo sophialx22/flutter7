@@ -75,12 +75,12 @@ class _HomeViewState extends State<_HomeView> {
               return _HomeContent(
                 items: items,
                 images: images,
-                onItemTap: (title) {
-                  if (title == 'Личный кабинет') {
-                    _onItemTapped(1);
-                  } else {
-                    Navigator.pushReplacementNamed(context, Routes.detail);
-                  }
+                onItemTap: (HomeItem item) {
+                  Navigator.pushReplacementNamed(
+                    context,
+                    Routes.detail,
+                    arguments: item, // <--- ВОТ ЗДЕСЬ ПЕРЕДАЧА
+                  );
                 },
               );
           }
@@ -101,7 +101,7 @@ class _HomeViewState extends State<_HomeView> {
 class _HomeContent extends StatelessWidget {
   final List<HomeItem> items;
   final List<String> images;
-  final Function(String) onItemTap;
+  final Function(HomeItem) onItemTap;
 
   const _HomeContent({required this.items, required this.images, required this.onItemTap});
 
@@ -115,23 +115,29 @@ class _HomeContent extends StatelessWidget {
         if (isWide) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildTitle(),
-                      const SizedBox(height: 20),
-                      _buildDescription(),
-                      const SizedBox(height: 20),
-                      _buildImagesGrid(),
-                    ],
-                  ),
+                _buildTitle(),
+                const SizedBox(height: 20),
+                _buildDescription(),
+                const SizedBox(height: 20),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: _buildImagesGrid(),
+                    ),
+                    SizedBox(width: spacing),
+                    Expanded(
+                      flex: 1,
+                      child: _buildItemsGrid(),
+                    ),
+                  ],
                 ),
-                SizedBox(width: spacing),
-                Expanded(child: _buildItemsGrid()),
+                const SizedBox(height: 30),
+                _buildAuthor(),
               ],
             ),
           );
@@ -146,20 +152,7 @@ class _HomeContent extends StatelessWidget {
               const SizedBox(height: 20),
               _buildDescription(),
               const SizedBox(height: 20),
-              SizedBox(
-                height: 150,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: images.length,
-                  itemBuilder: (context, index) => Container(
-                    margin: const EdgeInsets.only(right: 10),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.asset(images[index], width: 150, height: 150, fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-              ),
+              _buildImagesGrid(),
               const SizedBox(height: 20),
               _buildItemsList(),
               const SizedBox(height: 30),
@@ -184,13 +177,13 @@ class _HomeContent extends StatelessWidget {
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(border: Border.all(color: Colors.pink), borderRadius: BorderRadius.circular(20)),
     child: const Text(
-      'Описание: Онлайн-кинотеатр — это сервис, который позволяет смотреть фильмы и сериалы через интернет без скачивания.',
+      'Описание: Онлайн-кинотеатр — это сервис, который позволяет смотреть фильмы и сериалы через интернет без скачивания. Пользователь выбирает фильм, оплачивает подписку и смотрит его на любом устройстве.',
       style: TextStyle(fontFamily: 'Ubuntu', fontSize: 16),
     ),
   );
 
   Widget _buildImagesGrid() => SizedBox(
-    height: 200,
+    height: 150,
     child: ListView.builder(
       scrollDirection: Axis.horizontal,
       itemCount: images.length,
@@ -217,7 +210,7 @@ class _HomeContent extends StatelessWidget {
           title: Text(item.title),
           subtitle: Text(item.subtitle),
           trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () => onItemTap(item.title),
+          onTap: () => onItemTap(item),
         ),
       );
     },
@@ -235,7 +228,7 @@ class _HomeContent extends StatelessWidget {
         child: ListTile(
           leading: Icon(item.icon, color: Colors.pink),
           title: Text(item.title, style: const TextStyle(fontSize: 14)),
-          onTap: () => onItemTap(item.title),
+          onTap: () => onItemTap(item),
         ),
       );
     },

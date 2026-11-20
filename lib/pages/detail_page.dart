@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/home_item.dart';
 import '../routes.dart';
 
 class DetailPage extends StatelessWidget {
@@ -6,35 +7,41 @@ class DetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final item = ModalRoute.of(context)?.settings.arguments as HomeItem?;
+    final title = item?.title ?? 'Пункт N';
+    final subtitle = item?.subtitle ?? 'Описание пункта N';
+    final icon = item?.icon ?? Icons.info;
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Пункт N'),
+        title: Text(title),
         centerTitle: true,
         backgroundColor: Colors.pinkAccent,
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(24),
+      body: Padding(
+        padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             SizedBox(
               width: 200,
               height: 150,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  border: Border.fromBorderSide(BorderSide(color: Colors.black)),
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  border: Border.fromBorderSide(const BorderSide(color: Colors.black)),
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
                 ),
                 child: Center(
-                  child: Text('Картинка', style: TextStyle(fontSize: 16)),
+                  child: Icon(icon, size: 60, color: Colors.pink),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
-              'Описание пункта N',
-              style: TextStyle(fontSize: 20, fontFamily: 'Ubuntu'),
+              subtitle,
+              style: const TextStyle(fontSize: 20, fontFamily: 'Ubuntu'),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
